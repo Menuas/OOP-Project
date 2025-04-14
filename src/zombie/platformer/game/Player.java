@@ -1,49 +1,28 @@
 package zombie.platformer.game;
 
-public class Player {
+public class Player extends Entity {
     private Inventory inventory;
-    private int health;
-    private int speed;
 
-    public Player() {
+    public Player(float x, float y, float width, float height, float speed, int maxHealth) {
+        super(x, y, width, height, speed, maxHealth);
         this.inventory = new Inventory();
-        this.health = 100;
-        this.speed = 0;
     }
 
-    public Player(Inventory inventory, int health, int speed) {
-        if (health <= 0 || health > 100 || speed <= 0 || speed > 100) {
-            throw new IllegalArgumentException();
-        }
+    public Player(Inventory inventory, float x, float y, float width, float height, float speed, int maxHealth) {
+        super(x, y, width, height, speed, maxHealth);
         this.inventory = inventory;
-        this.health = health;
-        this.speed = speed;
     }
 
-    public void setHealth(int health) {
-        if (health <= 0 || health > 100) {
-            this.health = health;
+    public void onCollide(Entity other) {
+        if (other instanceof Zombie) {
+            Zombie zombie = (Zombie)other;
+
+            // zombie collided with player, lose health and shit
         }
     }
 
-    public void setSpeed(int speed) {
-        if (speed <= 0 || speed > 100) {
-            this.speed = speed;
-        }
-    }
+    public void draw() {}
 
-    public int getHealth() {
-        return health;
-    }
-
-    public int getSpeed() {
-        return speed;
-    }
-
-    public void run() {
-        while (true) {
-            // while user hold button the player coordinates change
-        }
-    }
+    public void update() {}
 }
 

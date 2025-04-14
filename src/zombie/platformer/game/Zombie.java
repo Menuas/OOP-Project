@@ -1,16 +1,9 @@
 package zombie.platformer.game;
 
-public class Zombie {
+public class Zombie extends Entity {
 
     public enum ZombieState {INACTIVE, MOVING, ATTACKING, DEAD}
 
-    private float x;            // Current x-position in the game world
-    private float y;            // Current y-position in the game world
-    private float width;        // Zombie's width (for collision/visual)
-    private float height;       // Zombie's height (for collision/visual)
-    private float speed;        // Movement speed
-    private int health;         // Current health
-    private int maxHealth;      // Maximum health
     private int damage;         // Damage zombie inflicts on player
     private boolean facingRight; // True if facing right, false if facing left
 
@@ -20,12 +13,7 @@ public class Zombie {
     private float wanderChance = 0.01f;
 
     public Zombie (float x, float y, float width, float height, float speed, int maxHealth, int damage) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.speed = speed;
-        this.maxHealth = maxHealth;
+        super(x, y, width, height, speed, maxHealth);
         this.damage = damage;
         this.facingRight = true;
         this.currentState = ZombieState.INACTIVE;
@@ -33,27 +21,6 @@ public class Zombie {
 
     // Getters
 
-    public float getX() {
-        return x;
-    }
-    public float getY() {
-        return y;
-    }
-    public float getWidth() {
-        return width;
-    }
-    public float getHeight() {
-        return height;
-    }
-    public float getSpeed() {
-        return speed;
-    }
-    public int getHealth() {
-        return health;
-    }
-    public int getMaxHealth() {
-        return maxHealth;
-    }
     public int getDamage() {
         return damage;
     }
@@ -66,15 +33,6 @@ public class Zombie {
 
     // Setters
 
-    public void setX(float x) {
-        this.x = x;
-    }
-    public void setY(float y) {
-        this.y = y;
-    }
-    public void setSpeed(float speed) {
-        this.speed = speed;
-    }
     public void setFacingRight(boolean facingRight) {
         this.facingRight = facingRight;
     }
@@ -84,15 +42,31 @@ public class Zombie {
         }
     }
 
+    public void draw() {}
+
+    public void onCollide(Entity other) {
+        if (other instanceof Zombie) {
+            Zombie zombie = (Zombie)other;
+
+
+        } else if (other instanceof Player) {
+            Player player = (Player)other;
+
+            // what happens to the zombie that collided with player
+        }
+    }
     // core methods
 
-    public void update (float deltaTime, Player player) {
+    public void update () {
+        float deltaTime = 0.0f;
+        Player player = null;
+
         switch (currentState) {
 
             case INACTIVE:
                 if (player != null) {
-                    float dx = player.getX() - x;
-                    float dy = player.getY() - y;
+                    float dx = player.getX() - getX();
+                    float dy = player.getY() - getY();
                     double distance = Math.sqrt(dx * dx + dy * dy);
                     if (distance < detection) {
                         currentState = ZombieState.ATTACKING;
@@ -131,9 +105,9 @@ public class Zombie {
 
     private void moveBehavior (float deltaTime) {
         if (facingRight) {
-            x += speed * deltaTime;
+            setX(getSpeed() * deltaTime + getX());
         } else {
-            x -= speed * deltaTime;
+            setX(-getSpeed() * deltaTime + getX());
         }
     }
 
