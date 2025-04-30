@@ -4,8 +4,8 @@ public class Zombie extends Entity {
 
     public enum ZombieState {INACTIVE, MOVING, ATTACKING, DEAD}
 
-    private int damage;         // Damage zombie inflicts on player
-    private boolean facingRight; // True if facing right, false if facing left
+    private int damage;           // Damage zombie inflicts on player
+    private boolean facingRight;  // True if facing right, false if facing left
 
     private ZombieState currentState;
 
