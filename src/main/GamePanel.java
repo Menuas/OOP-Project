@@ -1,6 +1,7 @@
 package main;
 
 import entity.Player;
+import entity.Zombie;
 import object.SuperObject;
 import tile.TileManager;
 import ui.UI;
@@ -37,6 +38,7 @@ public class GamePanel extends JPanel implements Runnable{
     public UI ui = new UI(this);
     public EventHandler eHandler = new EventHandler(this);
     public Player player = new Player(this, keyH);
+    public Zombie zombie = new Zombie(this, 20, 20);
     public SuperObject[] obj = new SuperObject[10];
     // GAME STATE
     public int gameState;
@@ -88,6 +90,7 @@ public class GamePanel extends JPanel implements Runnable{
     public void update() {
         if (gameState == playState) {
             player.update();
+            zombie.update();
         }
         if (gameState == pauseState) {
             // PAUSE
@@ -108,10 +111,11 @@ public class GamePanel extends JPanel implements Runnable{
         }
         // PLAYER
         player.draw(g2);
-
+        zombie.draw(g2);
         // UI
         ui.draw(g2);
 
         g2.dispose();
     }
 }
+

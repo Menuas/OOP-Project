@@ -15,6 +15,11 @@ public class Player extends Entity {
     public int hasKey = 0;
     public static final int[] PLAYER_COORDS = {23, 21};
 
+    public int maxHealth = 5;
+    public int health;
+
+
+
     public Player(GamePanel gp, KeyHandler keyH) {
         this.gp = gp;
         this.keyH = keyH;
@@ -54,7 +59,13 @@ public class Player extends Entity {
         // PLAYER STATUS
         maxLife = 6;
         life = maxLife;
+
+        worldX = gp.tileSize * PLAYER_COORDS[0];
+        worldY = gp.tileSize * PLAYER_COORDS[1];
+        speed = 4;
+        direction = "down";
     }
+
 
     public void update() {
         if (keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true || keyH.rightPressed == true) {

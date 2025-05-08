@@ -9,6 +9,45 @@ public class CollisionChecker {
         this.gp = gp;
     }
 
+    // in CollisionChecker.java
+    public int checkEntity(Entity entity, Entity[] targets) {
+        int index = 999;
+
+        for (int i = 0; i < targets.length; i++) {
+            Entity target = targets[i];
+            if (target == null || target == entity) continue;
+
+            // 1) position solid areas at world coords
+            entity.solidArea.x = entity.worldX + entity.solidAreaDefaultX;
+            entity.solidArea.y = entity.worldY + entity.solidAreaDefaultY;
+            target.solidArea.x = target.worldX + target.solidAreaDefaultX;
+            target.solidArea.y = target.worldY + target.solidAreaDefaultY;
+
+            // 2) simulate movement
+            switch(entity.direction) {
+                case "up":    entity.solidArea.y -= entity.speed; break;
+                case "down":  entity.solidArea.y += entity.speed; break;
+                case "left":  entity.solidArea.x -= entity.speed; break;
+                case "right": entity.solidArea.x += entity.speed; break;
+            }
+
+            // 3) check intersection
+            if (entity.solidArea.intersects(target.solidArea)) {
+                entity.collisionOn = true;
+                index = i;
+            }
+
+            // 4) reset to defaults
+            entity.solidArea.x = entity.solidAreaDefaultX;
+            entity.solidArea.y = entity.solidAreaDefaultY;
+            target.solidArea.x = target.solidAreaDefaultX;
+            target.solidArea.y = target.solidAreaDefaultY;
+        }
+
+        return index;
+    }
+
+
     public void checkTile(Entity entity) {
         int entityLeftWorldX = entity.worldX + entity.solidArea.x;
         int entityRightWorldX = entity.worldX + entity.solidArea.x + entity.solidArea.width;

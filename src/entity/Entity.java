@@ -15,4 +15,6 @@ public class Entity {
     public boolean collisionOn = false;
     // CHARACTER STATUS
     public int maxLife, life;
+    public int maxHealth;
+    public int health;
 }
