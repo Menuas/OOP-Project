@@ -27,9 +27,9 @@ public class KeyHandler implements KeyListener {
         } else if (code == KeyEvent.VK_ENTER) {
             enterPressed = true;
         } else if (code == KeyEvent.VK_P) {
-            if (gp.gameState == gp.playState) {
+            if (gp.gameState == gp.playState && gp.gameState != gp.gameOverState) {
                 gp.gameState = gp.pauseState;
-            } else if (gp.gameState == gp.pauseState) {
+            } else if (gp.gameState == gp.pauseState && gp.gameState != gp.gameOverState) {
                 gp.gameState = gp.playState;
             }
         }
@@ -46,6 +46,8 @@ public class KeyHandler implements KeyListener {
             leftPressed = false;
         } else if (code == KeyEvent.VK_D) {
             rightPressed = false;
+        } else if (code == KeyEvent.VK_ENTER) {
+            enterPressed = false;
         }
 
     }

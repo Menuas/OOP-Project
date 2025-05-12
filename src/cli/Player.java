@@ -7,16 +7,25 @@ public class Player {
     private boolean hasKey = false;
     private boolean chestCollected = false;
 
+    private int health;
+    private final int maxHealth = 100;
+
     public boolean getHasKey() {
         return hasKey;
     }
+
     public boolean getChestCollected() {
         return chestCollected;
+    }
+
+    public int getHealth() {
+        return health;
     }
 
     public Player(int startRow, int startCol) {
         this.row = startRow;
         this.col = startCol;
+        this.health = maxHealth;
     }
 
     public int getRow() {
@@ -28,7 +37,7 @@ public class Player {
     }
 
     public void collectKey() {
-        System.out.println("WE GOT A KEY YOU MF");
+        System.out.println("WE GOT A KEY!");
         hasKey = true;
     }
 
@@ -36,6 +45,26 @@ public class Player {
         System.out.println("WIN WIN WIN");
         chestCollected = true;
 
+    }
+
+    public void restoreHealthIfNearWater(Map map) {
+        if (isNearWater(map)) {
+            health = maxHealth;
+            System.out.println("You drink water");
+        }
+    }
+
+    /** Checks the four adjacent tiles for water. */
+    private boolean isNearWater(Map map) {
+        // north
+        if (map.isWater(row-1, col)) return true;
+        // south
+        if (map.isWater(row+1, col)) return true;
+        // west
+        if (map.isWater(row, col-1)) return true;
+        // east
+        if (map.isWater(row, col+1)) return true;
+        return false;
     }
 
     public void move(char direction, Map map) {
@@ -55,11 +84,13 @@ public class Player {
         } else if (map.isWall(newRow, newCol)) {
             System.out.println("You can't move there! It's a wall.");
         } else if (map.isDoor(newRow, newCol) && !hasKey) {
-            System.out.println("Nigga what are u doing??? U need a key");
+            System.out.println("Nigga what are you doing? You need a key");
         } else {
             map.updatePlayerPosition(this, newRow, newCol);
             row = newRow;
             col = newCol;
+
+            restoreHealthIfNearWater(map);
         }
     }
 }

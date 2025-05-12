@@ -82,6 +82,14 @@ public class Map {
         return false && row == exitRow && col == exitCol;
     }
 
+    public boolean isWater(int row, int col) {
+        // make sure you’re in‐bounds first:
+        if (row < 0 || row >= grid.length || col < 0 || col >= grid[0].length) {
+            return false;
+        }
+        return grid[row][col] == '2';
+    }
+
     public void updatePlayerPosition(Player p, int newRow, int newCol) {
         if (isKey(newRow, newCol) && !p.getHasKey()) {
             p.collectKey();

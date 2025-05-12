@@ -14,6 +14,13 @@ public class TileManager {
     public Tile[] tile;
     public int[][] mapTileNum;
 
+    public boolean isTileBlocked(int col, int row) {
+        int tileIndex = mapTileNum[col][row];
+        return tile[tileIndex].collision;
+    }
+
+
+
     public TileManager(GamePanel gp) {
         this.gp = gp;
         tile = new Tile[10];

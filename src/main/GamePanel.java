@@ -1,49 +1,53 @@
 package main;
 
 import entity.Player;
-import entity.Zombie;
+//import entity.Zombie;
 import object.SuperObject;
 import tile.TileManager;
 import ui.UI;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-public class GamePanel extends JPanel implements Runnable{
+public class GamePanel extends JPanel implements Runnable {
     // SCREEN SETTINGS
     final int originalTileSize = 16; // 16x16 tile
-    final int scale = 3;
-    public final int tileSize = originalTileSize * scale; // 48x48 tile
+    final int scale            = 3;
+    public final int tileSize   = originalTileSize * scale; // 48x48 tile
     public final int maxScreenCol = 16;
     public final int maxScreenRow = 12;
-    public final int screenWidth = tileSize * maxScreenCol; // 768px
-    public final int screenHeight = tileSize * maxScreenRow;// 576px
+    public final int screenWidth  = tileSize * maxScreenCol; // 768px
+    public final int screenHeight = tileSize * maxScreenRow; // 576px
+
     // WORLD MAP SETTINGS
     public final int maxWorldCol = 50;
     public final int maxWorldRow = 50;
-    public final int worldWidth = tileSize * maxWorldCol;
+    public final int worldWidth  = tileSize * maxWorldCol;
     public final int worldHeight = tileSize * maxWorldRow;
+
     // FPS
     int fps = 60;
 
-    // TILES
-    TileManager tileM = new TileManager(this);
-    // KEY HANDLER
-    public KeyHandler keyH = new KeyHandler(this);
-    // TIME
-    public Thread gameThread;
-    // COLLISION CHECKER
+    // GAME COMPONENTS
+    public TileManager tileM      = new TileManager(this);
+    public KeyHandler keyH        = new KeyHandler(this);
     public CollisionChecker cChecker = new CollisionChecker(this);
-    public AssetSetter aSetter = new AssetSetter(this);
-    public UI ui = new UI(this);
-    public EventHandler eHandler = new EventHandler(this);
-    public Player player = new Player(this, keyH);
-    public Zombie zombie = new Zombie(this, 20, 20);
-    public SuperObject[] obj = new SuperObject[10];
+    public AssetSetter aSetter    = new AssetSetter(this);
+    public UI ui                  = new UI(this);
+    public EventHandler eHandler  = new EventHandler(this);
+    public Player player          = new Player(this, keyH);
+//    public Zombie zombie          = new Zombie(this, 20, 20);  // ← uncommented
+    public SuperObject[] obj      = new SuperObject[10];
+
     // GAME STATE
     public int gameState;
-    public final int playState = 1;
-    public final int pauseState = 2;
+    public final int playState     = 1;
+    public final int pauseState    = 2;
+    public final int gameOverState = 3;
+
+    private Thread gameThread;
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -51,10 +55,25 @@ public class GamePanel extends JPanel implements Runnable{
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
+
+        // Mouse listener for Restart button
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (gameState == gameOverState) {
+                    int mx = e.getX();
+                    int my = e.getY();
+                    if (ui.isRestartArea(mx, my)) {
+                        restartApp();
+                    }
+                }
+            }
+        });
     }
 
     public void setupGame() {
         aSetter.setObject();
+        player.setDefaultValues();
         gameState = playState;
     }
 
@@ -63,59 +82,72 @@ public class GamePanel extends JPanel implements Runnable{
         gameThread.start();
     }
 
-    public void run() {
-        double drawInterval = 1000000000 / fps;
-        double nextDrawTime = System.nanoTime() + drawInterval;
-        while (gameThread != null) {
+    public void stopGame() {
+        gameThread = null;
+    }
 
-            // 1. UPDATE THE INFORMATION SUCH AS CHARACTER POSITION ETC.
+    private void restartApp() {
+        JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        frame.dispose();
+        Main.main(new String[0]);
+    }
+
+    @Override
+    public void run() {
+        double drawInterval = 1_000_000_000.0 / fps;
+        double nextDrawTime = System.nanoTime() + drawInterval;
+
+        while (gameThread != null) {
             update();
-            // 2. DRAW THE SCREEN WITH THE UPDATED INFORMATION.
             repaint();
 
             try {
-                double remainingTime = nextDrawTime - System.nanoTime();
-                remainingTime = remainingTime / 1000000;
-                if (remainingTime < 0) {
-                    remainingTime = 0;
-                }
-                Thread.sleep((long) remainingTime);
+                double remaining = (nextDrawTime - System.nanoTime()) / 1_000_000.0;
+                if (remaining < 0) remaining = 0;
+                Thread.sleep((long) remaining);
                 nextDrawTime += drawInterval;
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
     }
 
     public void update() {
         if (gameState == playState) {
+            if (ui.gameFinished) {
+                ui.gameFinished = true;
+                stopGame();
+                return;
+            }
+
             player.update();
-            zombie.update();
-        }
-        if (gameState == pauseState) {
-            // PAUSE
+//            zombie.update();
+
+            if (player.life <= 0) {
+                gameState = gameOverState;
+                stopGame();
+                return;
+            }
         }
     }
 
-    public void paintComponent(Graphics g) {
+    @Override
+    protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
-        // TILE
-        tileM.draw(g2);
-        // OBJECT
-        for (int i = 0; i < obj.length; i++) {
-            if (obj[i] != null) {
-                obj[i].draw(g2, this);
+        if (gameState == gameOverState) {
+            ui.draw(g2);
+        } else {
+            tileM.draw(g2);
+            for (SuperObject o : obj) {
+                if (o != null) o.draw(g2, this);
             }
+            player.draw(g2);
+//            zombie.draw(g2);
+            ui.draw(g2);
         }
-        // PLAYER
-        player.draw(g2);
-        zombie.draw(g2);
-        // UI
-        ui.draw(g2);
 
         g2.dispose();
     }
 }
-

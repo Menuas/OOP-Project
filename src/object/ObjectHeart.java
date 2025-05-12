@@ -1,13 +1,14 @@
 package object;
 
+import exceptions.InvalidImageSizeException;
 import main.GamePanel;
 
 import javax.imageio.ImageIO;
 import java.io.IOException;
 
-public class OBJ_Heart extends SuperObject{
+public class ObjectHeart extends SuperObject{
     public GamePanel gp;
-    public OBJ_Heart(GamePanel gp) {
+    public ObjectHeart(GamePanel gp) {
         this.gp = gp;
         name = "Chest";
         try {
@@ -18,7 +19,7 @@ public class OBJ_Heart extends SuperObject{
             image2 = uTool.scaleImage(image2, gp.tileSize, gp.tileSize);
             image3 = uTool.scaleImage(image3, gp.tileSize, gp.tileSize);
 
-        } catch(IOException e){
+        } catch(IOException | InvalidImageSizeException e){
             e.printStackTrace();
         }
     }

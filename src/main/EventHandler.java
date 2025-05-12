@@ -20,11 +20,28 @@ public class EventHandler {
         eventRectDefaultY = eventRect.y;
     }
 
+
     public void checkEvent() {
-        if (hit(23,7, "up") == true) {
+        int playerCol = gp.player.worldX / gp.tileSize;
+        int playerRow = gp.player.worldY / gp.tileSize;
+
+        // Check surrounding tiles (up, down, left, right)
+        if (isWaterTile(playerCol, playerRow - 1) || // Up
+                isWaterTile(playerCol, playerRow + 1) || // Down
+                isWaterTile(playerCol - 1, playerRow) || // Left
+                isWaterTile(playerCol + 1, playerRow)) { // Right
             heal();
         }
     }
+
+    private boolean isWaterTile(int col, int row) {
+        if (col < 0 || col >= gp.maxWorldCol || row < 0 || row >= gp.maxWorldRow) {
+            return false; // Out of bounds
+        }
+        int tileNum = gp.tileM.mapTileNum[col][row];
+        return tileNum == 2; // Assuming tile[2] is the water tile
+    }
+
 
     public boolean hit(int eventCol, int eventRow, String reqDirection) {
         boolean hit = false;
@@ -48,8 +65,5 @@ public class EventHandler {
     public void heal() {
         gp.ui.showMessage("You drink water.");
         gp.player.life = gp.player.maxLife;
-        if (gp.keyH.enterPressed == true) {
-
-        }
     }
 }

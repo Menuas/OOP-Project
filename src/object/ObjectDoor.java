@@ -3,8 +3,8 @@ package object;
 import javax.imageio.ImageIO;
 import java.io.IOException;
 
-public class OBJ_Door extends SuperObject{
-    public OBJ_Door() {
+public class ObjectDoor extends SuperObject{
+    public ObjectDoor() {
         name = "Door";
         collision = true;
         try {
